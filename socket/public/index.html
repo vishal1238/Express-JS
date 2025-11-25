@@ -3,9 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Chat App</title>
 </head>
 <body>
-    
+    <h2>Chat Application</h2>
+
+    <ul id="message"></ul>
+
+    <form id="chatForm" action="">
+        <input type="text" id="messageInput" name="messageInput" autocomplete="off"/>
+        <button type="submit">Send</button>
+    </form>
+
+    <!-- Load socket.io client -->
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+    // THIS FIX ensures DOM is ready before accessing elements
+    document.addEventListener("DOMContentLoaded", () => {
+
+        const socket = io();
+
+        const messageList = document.getElementById('message');
+        const form = document.getElementById('chatForm');
+        const input = document.getElementById('messageInput');
+
+        // show message from server
+        socket.on('chatMessage', (msg) => {
+            const li = document.createElement('li');
+            li.textContent = msg;
+            messageList.appendChild(li);
+        });
+
+        // send message to server
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const message = input.value.trim();
+            if (!message) return;
+
+            socket.emit('chatMessage', message);
+            input.value = '';
+        });
+
+    });
+    </script>
 </body>
 </html>

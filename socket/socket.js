@@ -4,6 +4,9 @@ import { createServer } from 'node:http';
 
 const app = express();
 
+// serve public folder
+app.use(express.static("public"));
+
 // create http server
 const server = createServer(app);
 
@@ -16,23 +19,26 @@ io.on("connection", (socket) => {
     // send welcome message
     socket.emit("chatMessage", "Welcome to class chat");
 
-    // listen for message from client
+    // listen from client
     socket.on("chatMessage", (msg) => {
         console.log("msg from client:", msg);
-        io.emit("chatMessage", msg); // send to everyone
+
+        // broadcast to all
+        io.emit("chatMessage", msg);
     });
 
-    // disconnect event
+    // disconnect
     socket.on("disconnect", () => {
         console.log("user disconnected:", socket.id);
     });
 });
 
-// routes
+// send index.html
 app.get("/", (req, res) => {
-    res.send("<h1>Hello world</h1>");
+    res.sendFile(process.cwd() + "/public/index.html");
 });
 
+// start server
 server.listen(3000, () => {
     console.log("server running at http://localhost:3000");
 });
